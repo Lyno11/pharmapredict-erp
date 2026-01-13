@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PharmaPredict Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 40px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 40px; }
+        
+        /* Grid Layout for the 4 Main Buttons */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none; /* Remove underline from links */
+            color: inherit;
+        }
+
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        
+        .icon { font-size: 50px; margin-bottom: 20px; display: block; }
+        .title { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .desc { color: #7f8c8d; margin-top: 10px; }
+
+        /* Color Coding */
+        .card.inventory { border-top: 5px solid #3498db; }
+        .card.supplier { border-top: 5px solid #9b59b6; }
+        .card.customer { border-top: 5px solid #2ecc71; }
+        .card.order { border-top: 5px solid #e67e22; }
+    </style>
+</head>
+<body>
+
+    <h1>🏥 PharmaPredict ERP</h1>
+
+    <div class="dashboard-grid">
+        <a href="inventory_menu.html" class="card inventory">
+            <span class="icon">📦</span>
+            <div class="title">Inventory</div>
+            <div class="desc">Manage Stock, Manufacturers & Disposals</div>
+        </a>
+
+        <a href="suppliers.html" class="card supplier">
+            <span class="icon">🚛</span>
+            <div class="title">Suppliers</div>
+            <div class="desc">View Suppliers & Purchase Orders</div>
+        </a>
+
+        <a href="customers.html" class="card customer">
+            <span class="icon">👥</span>
+            <div class="title">Customers</div>
+            <div class="desc">Patient Profiles & History</div>
+        </a>
+
+        <a href="order.html" class="card order">
+            <span class="icon">🛒</span>
+            <div class="title">Place Order</div>
+            <div class="desc">Process New Transactions</div>
+        </a>
+    </div>
+
+</body>
+</html>

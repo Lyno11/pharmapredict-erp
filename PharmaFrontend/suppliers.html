@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supplier Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 10px; margin-top: 40px; }
+        
+        .form-box { background: #fff; padding: 20px; margin-bottom: 30px; border-radius: 8px; border-top: 5px solid #9b59b6; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; width: 18%; }
+        button { background-color: #9b59b6; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+
+        table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #8e44ad; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" style="text-decoration: none; font-weight: bold; color: #555;">⬅ Home</a>
+
+    <div class="form-box">
+        <h3>➕ Register New Supplier</h3>
+        <input type="text" id="sId" placeholder="ID (e.g. SUP02)">
+        <input type="text" id="sName" placeholder="Company Name">
+        <input type="text" id="sPhone" placeholder="Phone">
+        <input type="email" id="sEmail" placeholder="Email">
+        <input type="text" id="sAddress" placeholder="City/State">
+        <button onclick="addSupplier()">Register Supplier</button>
+    </div>
+    
+    <h2>🚛 Registered Suppliers</h2>
+    <table id="supplierTable">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th></tr>
+        </thead>
+        <tbody id="supplierBody"></tbody>
+    </table>
+
+    <h2>📄 Purchase Orders History</h2>
+    <table id="poTable">
+        <thead>
+            <tr><th>Order ID</th><th>Supplier</th><th>Date</th><th>Status</th><th>Total Cost</th></tr>
+        </thead>
+        <tbody id="poBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const API_BASE = "http://localhost:8080/api";
+
+    async function loadData() {
+        // Load Suppliers
+        const supRes = await fetch(`${API_BASE}/suppliers`);
+        const suppliers = await supRes.json();
+        document.getElementById('supplierBody').innerHTML = suppliers.map(s => 
+            `<tr><td>${s.supplierId}</td><td>${s.name}</td><td>${s.phone}</td><td>${s.email}</td><td>${s.address}</td></tr>`
+        ).join('');
+
+        // Load Purchase Orders
+        const poRes = await fetch(`${API_BASE}/purchase-orders`);
+        const pos = await poRes.json();
+        document.getElementById('poBody').innerHTML = pos.map(p => 
+            `<tr><td>${p.orderId}</td><td>${p.supplierId}</td><td>${p.orderDate}</td><td>${p.status}</td><td>$${p.totalCost}</td></tr>`
+        ).join('');
+    }
+
+    async function addSupplier() {
+        const newSup = {
+            supplierId: document.getElementById('sId').value,
+            name: document.getElementById('sName').value,
+            phone: document.getElementById('sPhone').value,
+            email: document.getElementById('sEmail').value,
+            address: document.getElementById('sAddress').value
+        };
+
+        if(!newSup.supplierId || !newSup.name) return alert("ID/Name required");
+
+        const res = await fetch(`${API_BASE}/suppliers`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newSup)
+        });
+
+        if(res.ok) { alert("Supplier Registered!"); loadData(); }
+        else alert("Error saving supplier.");
+    }
+
+    loadData();
+</script>
+</body>
+</html>
