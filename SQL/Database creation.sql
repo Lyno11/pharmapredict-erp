@@ -98,3 +98,77 @@ CREATE TABLE Customer_Order_Detail (
     CONSTRAINT cod_ord_fk FOREIGN KEY (order_number) REFERENCES Customer_Order(order_number),
     CONSTRAINT cod_med_fk FOREIGN KEY (medication_ID) REFERENCES Medication(ndcCode)
 );
+
+--ADDED TABLES from initial version-- :
+-- Parent Table: The Order sent to Suppliers
+CREATE TABLE Warehouse_Order (
+    warehouse_order_id VARCHAR(50) NOT NULL,
+    medication_id BIGINT NOT NULL,
+    supplier_id VARCHAR(50) NOT NULL,
+    stock_on_order INT NOT NULL,
+    delivery_date DATE,
+    
+    PRIMARY KEY (warehouse_order_id),
+    
+    CONSTRAINT fk_wo_med 
+    FOREIGN KEY (medication_id) REFERENCES Medication(ndc_code),
+    
+    CONSTRAINT fk_wo_sup 
+    FOREIGN KEY (supplier_id) REFERENCES Supplier(supplier_id)
+);
+
+-- Child Table: The Log of items actually arriving
+CREATE TABLE Warehouse_Log (
+    log_id VARCHAR(50) NOT NULL,
+    warehouse_order_id VARCHAR(50) NOT NULL,
+    medication_id BIGINT NOT NULL,
+    quantity_received INT,
+    status VARCHAR(255),
+    date_closed DATE,
+    notes VARCHAR(255),
+    author VARCHAR(255),
+    log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (log_id),
+    
+    CONSTRAINT fk_wl_order 
+    FOREIGN KEY (warehouse_order_id) REFERENCES Warehouse_Order(warehouse_order_id),
+    
+    CONSTRAINT fk_wl_med 
+    FOREIGN KEY (medication_id) REFERENCES Medication(ndc_code)
+);
+
+-- ==========================================
+--  SALES OPERATIONS (Point of Sale)
+-- ==========================================
+
+-- Parent Table: The Receipt Header (Who & When)
+CREATE TABLE Customer_Order (
+    order_id VARCHAR(50) NOT NULL,
+    customer_id VARCHAR(50) NOT NULL,
+    order_date DATE DEFAULT (CURRENT_DATE),
+    total_cost DECIMAL(10,2),
+    status VARCHAR(50) DEFAULT 'PROCESSING',
+    
+    PRIMARY KEY (order_id),
+    
+    CONSTRAINT fk_sales_cust 
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+);
+
+-- Child Table: The Line Items (What & How Many)
+CREATE TABLE Customer_Order_Detail (
+    detail_id VARCHAR(50) NOT NULL,
+    order_id VARCHAR(50) NOT NULL,
+    medication_id BIGINT NOT NULL,
+    quantity_ordered INT NOT NULL,
+    price_at_sale DECIMAL(10,2),
+    
+    PRIMARY KEY (detail_id),
+    
+    CONSTRAINT fk_detail_order 
+    FOREIGN KEY (order_id) REFERENCES Customer_Order(order_id),
+    
+    CONSTRAINT fk_detail_med 
+    FOREIGN KEY (medication_id) REFERENCES Medication(ndc_code)
+);
