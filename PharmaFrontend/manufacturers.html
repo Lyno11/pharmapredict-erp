@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manufacturers</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2980b9; }
+        
+        /* Form Styling */
+        .form-box { background: #eef2f3; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 5px solid #2980b9; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 18%; }
+        button { background-color: #2980b9; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #1f618d; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #2980b9; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="inventory_menu.html" style="text-decoration: none; font-weight: bold; color: #555;">⬅ Back to Menu</a>
+    <h1>🏭 Manufacturers</h1>
+
+    <div class="form-box">
+        <h3>➕ Add Manufacturer</h3>
+        <input type="text" id="mId" placeholder="ID (e.g. MF003)">
+        <input type="text" id="mName" placeholder="Name">
+        <input type="text" id="mPhone" placeholder="Phone">
+        <input type="email" id="mEmail" placeholder="Email">
+        <input type="text" id="mAddress" placeholder="Address">
+        <button onclick="addManufacturer()">Save</button>
+    </div>
+
+    <table id="manTable">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const API_URL = "http://localhost:8080/api/manufacturers";
+
+    async function loadData() {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        data.forEach(item => {
+            tableBody.innerHTML += `<tr><td>${item.manufacturerId}</td><td><strong>${item.name}</strong></td><td>${item.phone}</td><td>${item.email}</td><td>${item.address}</td></tr>`;
+        });
+    }
+
+    async function addManufacturer() {
+        const newMan = {
+            manufacturerId: document.getElementById('mId').value,
+            name: document.getElementById('mName').value,
+            phone: document.getElementById('mPhone').value,
+            email: document.getElementById('mEmail').value,
+            address: document.getElementById('mAddress').value
+        };
+
+        if(!newMan.manufacturerId || !newMan.name) { alert("ID and Name are required!"); return; }
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newMan)
+            });
+            if(res.ok) { 
+                alert("Manufacturer Added!"); 
+                loadData(); 
+                document.getElementById('mId').value = ''; // Clear input
+            }
+            else { alert("Error saving. Check ID unique."); }
+        } catch(e) { console.error(e); }
+    }
+
+    loadData();
+</script>
+</body>
+</html>
