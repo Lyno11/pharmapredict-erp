@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports & Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #d8f4eb; padding: 20px; }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        
+        .panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        /* Flexbox to put the title and button on the same line */
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; }
+        .panel-header h2 { margin: 0; color: #2c3e50; font-size: 1.2em; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #ecf0f1; color: #333; }
+        
+        .text-red { color: #e74c3c; font-weight: bold; }
+        .text-green { color: #27ae60; font-weight: bold; }
+
+        /* Style for the new Export button */
+        .btn-export { background-color: #ecf0f1; border: 1px solid #bdc3c7; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #2c3e50; transition: 0.2s; }
+        .btn-export:hover { background-color: #d5dbdb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" style="text-decoration: none; font-weight: bold; color: #555;">⬅ Back to Dashboard</a>
+    <h1 style="color: #2c3e50;">📊 Business Reports & Analytics</h1>
+
+    <div class="chart-grid">
+        <div class="panel" style="border-top: 5px solid #f39c12;">
+            <div class="panel-header"><h2>🏆 Top Selling Products</h2></div>
+            <canvas id="topSellingChart" height="200"></canvas>
+        </div>
+        
+        <div class="panel" style="border-top: 5px solid #27ae60;">
+            <div class="panel-header"><h2>💰 Warehouse Valuation</h2></div>
+            <canvas id="valuationChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="table-grid">
+        <div class="panel" style="border-top: 5px solid #e74c3c;">
+            <div class="panel-header">
+                <h2>⏳ Expiry Watchlist</h2>
+                <button class="btn-export" onclick="downloadCSV('expiryTable', 'Expiry_Watchlist.csv')">📥 Export CSV</button>
+            </div>
+            <table id="expiryTable">
+                <thead><tr><th>Medication</th><th>Exp Date</th><th>Stock</th></tr></thead>
+                <tbody id="expiryBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="panel" style="border-top: 5px solid #8e44ad;">
+            <div class="panel-header">
+                <h2>💎 Customer Lifetime Value</h2>
+                <button class="btn-export" onclick="downloadCSV('clvTable', 'Customer_Lifetime_Value.csv')">📥 Export CSV</button>
+            </div>
+            <table id="clvTable">
+                <thead><tr><th>Customer Name</th><th>Total Orders</th><th>Total Spent</th></tr></thead>
+                <tbody id="clvBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-grid">
+        <div class="panel" style="border-top: 5px solid #95a5a6;">
+            <div class="panel-header">
+                <h2>💤 Unsold Medications</h2>
+                <button class="btn-export" onclick="downloadCSV('unsoldTable', 'Unsold_Medications.csv')">📥 Export CSV</button>
+            </div>
+            <table id="unsoldTable">
+                <thead><tr><th>NDC Code</th><th>Medication Name</th></tr></thead>
+                <tbody id="unsoldBody"><tr><td colspan="2">Loading...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="panel" style="border-top: 5px solid #34495e;">
+            <div class="panel-header">
+                <h2>🏭 Manufacturer Directory</h2>
+                <button class="btn-export" onclick="downloadCSV('directoryTable', 'Manufacturer_Directory.csv')">📥 Export CSV</button>
+            </div>
+            <table id="directoryTable">
+                <thead><tr><th>Medication</th><th>Manufacturer</th><th>Phone</th></tr></thead>
+                <tbody id="directoryBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-grid">
+        <div class="panel" style="border-top: 5px solid #c0392b;">
+            <div class="panel-header">
+                <h2>⚠️ Low Stock Alerts</h2>
+                <button class="btn-export" onclick="downloadCSV('lowStockTable', 'Low_Stock_Alerts.csv')">📥 Export CSV</button>
+            </div>
+            <table id="lowStockTable">
+                <thead><tr><th>Medication</th><th>Current Stock</th><th>Threshold</th></tr></thead>
+                <tbody id="lowStockBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="panel" style="border-top: 5px solid #2980b9;">
+            <div class="panel-header">
+                <h2>🚚 Pending Shipments</h2>
+                <button class="btn-export" onclick="downloadCSV('shipmentsTable', 'Pending_Shipments.csv')">📥 Export CSV</button>
+            </div>
+            <table id="shipmentsTable">
+                <thead><tr><th>Order ID</th><th>Supplier</th><th>ETA</th></tr></thead>
+                <tbody id="shipmentsBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const API_BASE = "http://localhost:8080/api/dashboard";
+
+    async function loadReports() {
+        try {
+            const expRes = await fetch(`${API_BASE}/expiring`);
+            const expData = await expRes.json();
+            document.getElementById('expiryBody').innerHTML = expData.length ? 
+                expData.map(d => `<tr><td>${d.name}</td><td class="text-red">${d.expirationDate}</td><td>${d.quantityAvailable}</td></tr>`).join('') :
+                `<tr><td colspan="3">No items expiring soon.</td></tr>`;
+
+            const clvRes = await fetch(`${API_BASE}/clv`);
+            const clvData = await clvRes.json();
+            document.getElementById('clvBody').innerHTML = clvData.length ? 
+                clvData.map(d => `<tr><td>${d.name}</td><td>${d.totalOrders}</td><td class="text-green">$${d.totalSpent.toFixed(2)}</td></tr>`).join('') :
+                `<tr><td colspan="3">No sales data yet.</td></tr>`;
+
+            const unsoldRes = await fetch(`${API_BASE}/unsold`);
+            const unsoldData = await unsoldRes.json();
+            document.getElementById('unsoldBody').innerHTML = unsoldData.length ? 
+                unsoldData.map(d => `<tr><td>${d.ndcCode}</td><td>${d.name}</td></tr>`).join('') :
+                `<tr><td colspan="2">All medications have been sold at least once!</td></tr>`;
+
+            const dirRes = await fetch(`${API_BASE}/med-manufacturers`);
+            const dirData = await dirRes.json();
+            document.getElementById('directoryBody').innerHTML = dirData.length ? 
+                dirData.map(d => `<tr><td>${d.medicationName}</td><td>${d.manufacturerName}</td><td>${d.phone}</td></tr>`).join('') :
+                `<tr><td colspan="3">No directory data found.</td></tr>`;
+
+            const stockRes = await fetch(`${API_BASE}/low-stock`);
+            const stockData = await stockRes.json();
+            document.getElementById('lowStockBody').innerHTML = stockData.length ? 
+                stockData.map(d => `<tr><td>${d.name}</td><td class="text-red">${d.currentStock}</td><td>${d.reorderLevel}</td></tr>`).join('') :
+                `<tr><td colspan="3" class="text-green">All stock levels healthy!</td></tr>`;
+
+            const shipRes = await fetch(`${API_BASE}/pending-shipments`);
+            const shipData = await shipRes.json();
+            document.getElementById('shipmentsBody').innerHTML = shipData.length ? 
+                shipData.map(d => `<tr><td>${d.orderId}</td><td>${d.supplierName}</td><td>${d.estimatedDelivery}</td></tr>`).join('') :
+                `<tr><td colspan="3">No pending shipments.</td></tr>`;
+
+            // Charts
+            const topRes = await fetch(`${API_BASE}/top-selling`);
+            const topData = await topRes.json();
+            drawBarChart('topSellingChart', topData.map(d => d.name), topData.map(d => d.totalSold), 'Total Units Sold', '#f39c12');
+
+            const valRes = await fetch(`${API_BASE}/valuation`);
+            const valData = await valRes.json();
+            drawBarChart('valuationChart', valData.map(d => d.name), valData.map(d => d.totalValue), 'Total Value ($)', '#27ae60');
+
+        } catch (error) {
+            console.error("Error loading reports:", error);
+        }
+    }
+
+    function drawBarChart(canvasId, labels, data, labelString, color) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: labelString, data: data, backgroundColor: color }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    // --- CSV EXPORT LOGIC ---
+    function downloadCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        let csv = [];
+        
+        // Loop through all rows
+        for (let i = 0; i < table.rows.length; i++) {
+            let row = [], cols = table.rows[i].querySelectorAll("td, th");
+            
+            // Loop through all columns
+            for (let j = 0; j < cols.length; j++) {
+                // Grab the text, remove commas and quotes to prevent breaking the CSV formatting
+                let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/,/g, "");
+                row.push(data);
+            }
+            csv.push(row.join(",")); // Join columns with commas
+        }
+
+        // Create the CSV file
+        const csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+        
+        // Create a hidden download link and click it
+        const downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink); // Clean up
+    }
+
+    // Initialize on load
+    loadReports();
+</script>
+</body>
+</html>
