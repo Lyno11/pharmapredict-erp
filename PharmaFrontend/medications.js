@@ -1,5 +1,5 @@
 // The URL of your running Java Backend
-const API_URL = "http://localhost:8080/api/medications";
+const API_URL = "https://pharmapredict-erp-production.up.railway.app/api/medications";
 
 async function fetchMedications() {
     const tableBody = document.getElementById('tableBody');

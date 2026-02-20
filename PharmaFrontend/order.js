@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api";
+const API_BASE = "https://pharmapredict-erp-production.up.railway.app/api";
 
 // 1. Load Dropdowns on Start
 async function init() {
