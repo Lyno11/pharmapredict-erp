@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/customers";
+const API_URL = "https://pharmapredict-erp-production.up.railway.app/api/customers";
 
 // 1. Fetch and Display Customers
 async function loadCustomers() {
